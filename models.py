@@ -13,3 +13,8 @@ class ConvertImage(BaseModel):
     base64_image: str
     image_format: Optional[str] = 'JPEG'
 
+class ResizeImage(BaseModel):
+    base64_image: str
+    image_format: Optional[str] = 'JPEG'
+    x: int
+    y: int
