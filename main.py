@@ -1,16 +1,23 @@
 import base64
+from base64 import b64encode
 from io import BytesIO
+from typing import Optional
 
 import requests
 from fastapi import FastAPI, HTTPException
 from PIL import Image
+from starlette.responses import RedirectResponse
 
-from models import ConvertImage, CropImage
+from models import ConvertImage, CropImage, ResizeImage
 
 app = FastAPI()
 
+@app.get("/")
+async def index():
+    return RedirectResponse(url="https://github.com/chand1012/ImageCropAPI")
+
 @app.get("/crop/")
-async def get_and_crop(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', height: int = 250, width: int = 250, x: int = 0, y: int = 0, image_format: str = 'JPEG'):
+async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', height: int = 250, width: int = 250, x: int = 0, y: int = 0, image_format: str = 'JPEG'):
     response = requests.get(url)
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
@@ -30,7 +37,7 @@ async def get_and_crop(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109
     return {'image': b64_image}
 
 @app.post("/crop/")
-async def get_and_crop_post(data: CropImage):
+async def crop_local(data: CropImage):
     b64_image = data.get('base64_image')
     height = data.get('height')
     width = data.get('width')
@@ -72,7 +79,7 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
 
 @app.post("/convert/")
 async def convert_local(data: ConvertImage):
-    b64_image = data.get('url')
+    b64_image = data.get('base64_image')
     image_format = data.get('image_format')
 
     image = Image.open(BytesIO(base64.b64decode(b64_image)))
@@ -86,4 +93,50 @@ async def convert_local(data: ConvertImage):
     image_buffer.close()
 
     return {'image': b64_image}
+
+@app.get("/resize/")
+async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', height: int = 250, width: int = 250, image_format: str = 'JPEG', resample: Optional[int] = 1):
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
+
+    image = Image.open(BytesIO(response.content))
+
+    image_buffer = BytesIO()
+
+    resized = image.resize((width, height), resample=resample)
+
+    resized.save(image_buffer, format=image_format)
+
+    image.close()
+    resized.close()
+
+    b64_image = base64.b64encode(image_buffer.getvalue())
+    image_buffer.close()
+
+    return {'image': b64_image}
+
+@app.post("/resize/")
+async def resize_local(data: ResizeImage):
+    b64_image = data.get('base64_image')
+    image_format = data.get('image_format')
+    width = data.get('width')
+    height = data.get('height')
+    resample = data.get('resample')
+
+    image = Image.open(BytesIO(base64.b64decode(b64_image)))
+
+    image_buffer = BytesIO()
+
+    resized = image.resize((width, height), resample=resample)
+
+    resized.save(image_buffer, format=image_format)
+
+    image.close()
+    resized.close()
+
+    b64_image = base64.b64encode(image_buffer.getvalue())
+    image_buffer.close()
+
+    return {'image':b64_image}
 
