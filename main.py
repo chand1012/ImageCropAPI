@@ -31,18 +31,14 @@ async def get_and_crop(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109
 
 @app.post("/crop/")
 async def get_and_crop_post(data: CropImage):
-    url = data.get('url')
+    b64_image = data.get('base64_image')
     height = data.get('height')
     width = data.get('width')
     x = data.get('x')
     y = data.get('y')
     image_format = data.get('image_format')
 
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
-
-    image = Image.open(BytesIO(response.content))
+    image = Image.open(BytesIO(base64.b64decode(b64_image)))
 
     cropped_image = image.crop((x, y, width+x, height+y))
 
@@ -76,14 +72,10 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
 
 @app.post("/convert/")
 async def convert_local(data: ConvertImage):
-    url = data.get('url')
+    b64_image = data.get('url')
     image_format = data.get('image_format')
 
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
-
-    image = Image.open(BytesIO(response.content))
+    image = Image.open(BytesIO(base64.b64decode(b64_image)))
 
     image_buffer = BytesIO()
 
@@ -94,3 +86,4 @@ async def convert_local(data: ConvertImage):
     image_buffer.close()
 
     return {'image': b64_image}
+
