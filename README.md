@@ -22,7 +22,7 @@ To get the latest image, just run `docker pull chand1012/image-crop-api:master`.
 
 ## Building the Docker Image.
 
-If you are trying to run the application on a platform other than a 64-bit Linux system, such as for a Raspberry Pi or ARM server, you can build the Docker image with the following:
+If you are trying to run the application on a platform other than a 64-bit Linux system, such as for a Raspberry Pi or ARM server, you can build the Docker Image with the following:
 
 ```Bash
 # This is assuming you have Docker installed.
@@ -32,11 +32,17 @@ docker build . -t image-crop-api:master # This will take about 20 minutes
 docker run image-crop-api:master 5000:5000
 ```
 
+Docker installation instructions found [here](https://docs.docker.com/get-docker/).
+
 # Running from Source.
 
+This has been tested on Ubuntu 18.04LTS only. Should work the same on Ubuntu 20.04LTS as well.
+
 ```Bash
+# this is for Ubuntu Linux. 
+# Install equivalent packages for your preferred distribution.
 sudo apt update
-sudo apt install python3-pip python3-dev build-essential # this is for Ubuntu Linux. For Windows, you will just need Python >= 3.6.x # For other *nix OSes, the equivalent packages will be needed.
+sudo apt install python3-pip python3-dev build-essential 
 git clone https://github.com/chand1012/ImageCropAPI.git
 cd ImageCropAPI
 sudo pip3 install virtualenv 
@@ -46,7 +52,7 @@ pip3 install -r requirements.txt
 deactivate
 ```
 
-To run the application, you must use the virtual environment installed to the application. If you would rather run with the system Python installation, just skip the virtualenv steps and install like any other module.
+To run the application, you must use the virtual environment installed to the application. If you would rather run with the system Python installation, just skip the `virtualenv` steps and install the modules with `pip3 install -r requirements.txt` . This will work on Python >= 3.6.
 
 To run the application:
 ```Bash

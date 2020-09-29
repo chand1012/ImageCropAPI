@@ -19,3 +19,6 @@ class ResizeImage(BaseModel):
     width: int
     height: int
     resample: Optional[int] = 1
+
+class Base64ImageResponse(BaseModel):
+    image: str
