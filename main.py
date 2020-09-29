@@ -10,7 +10,7 @@ from PIL import Image
 from starlette.responses import RedirectResponse
 
 from models import ConvertImage, CropImage, ResizeImage
-from lib import get_b64_size, close_all
+from lib import get_b64_size
 
 app = FastAPI()
 
