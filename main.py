@@ -26,12 +26,12 @@ async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41099
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
 
-    image = Image.open(BytesIO(response.content))
+    image_buffer = BytesIO()
+    content = BytesIO(response.content)
+    image = Image.open(content.getvalue())
+    content.close()
 
     cropped_image = image.crop((x, y, width+x, height+y))
-
-    image_buffer = BytesIO()
-
     cropped_image.save(image_buffer, format=image_format)
     cropped_image.close()
 
@@ -53,16 +53,17 @@ async def crop_local(data: CropImage):
     y = data.get('y')
     image_format = data.get('image_format')
 
-    image = Image.open(BytesIO(base64.b64decode(b64_image)))
+    image_buffer = BytesIO()
+    content = BytesIO(base64.b64decode(b64_image))
+    image = Image.open(content.getvalue())
+    content.close()
 
     cropped_image = image.crop((x, y, width+x, height+y))
-
-    image_buffer = BytesIO()
-
     cropped_image.save(image_buffer, format=image_format)
     cropped_image.close()
 
     b64_image = base64.b64encode(image_buffer.getvalue())
+
     image_buffer.close()
 
     return {'image': b64_image}
@@ -75,15 +76,17 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
 
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-
-    image = Image.open(BytesIO(response.content))
-
+    
     image_buffer = BytesIO()
+    content = BytesIO(response.content)
+    image = Image.open(content.getvalue())
+    content.close()
 
     image.save(image_buffer, format=image_format)
     image.close()
 
     b64_image = base64.b64encode(image_buffer.getvalue())
+
     image_buffer.close()
 
     return {'image': b64_image}
@@ -97,9 +100,10 @@ async def convert_local(data: ConvertImage):
     
     image_format = data.get('image_format')
 
-    image = Image.open(BytesIO(base64.b64decode(b64_image)))
-
     image_buffer = BytesIO()
+    content = BytesIO(base64.b64decode(b64_image))
+    image = Image.open(content.getvalue())
+    content.close()
 
     image.save(image_buffer, format=image_format)
     image.close()
@@ -117,20 +121,20 @@ async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc410
 
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-
-    image = Image.open(BytesIO(response.content))
-
+    
     image_buffer = BytesIO()
+    content = BytesIO(response.content)
+    image = Image.open(content.getvalue())
+    content.close()
 
     resized = image.resize((width, height), resample=resample)
-
     resized.save(image_buffer, format=image_format)
 
+    b64_image = base64.b64encode(image_buffer.getvalue())
+
+    image_buffer.close()
     image.close()
     resized.close()
-
-    b64_image = base64.b64encode(image_buffer.getvalue())
-    image_buffer.close()
 
     return {'image': b64_image}
 
@@ -146,18 +150,18 @@ async def resize_local(data: ResizeImage):
     height = data.get('height')
     resample = data.get('resample')
 
-    image = Image.open(BytesIO(base64.b64decode(b64_image)))
-
     image_buffer = BytesIO()
+    content = BytesIO(base64.b64decode(b64_image))
+    image = Image.open(content.getvalue())
+    content.close()
 
     resized = image.resize((width, height), resample=resample)
-
     resized.save(image_buffer, format=image_format)
 
+    b64_image = base64.b64encode(image_buffer.getvalue())
+    
     image.close()
     resized.close()
-
-    b64_image = base64.b64encode(image_buffer.getvalue())
     image_buffer.close()
 
     return {'image':b64_image}
