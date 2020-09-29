@@ -10,5 +10,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN pip3 install uvicorn
 RUN apt-get purge build-essential -y && apt-get autoremove -y
 COPY ./ .
-CMD ["uvicorn", "main:app", "--port", "5000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
 EXPOSE 5000
