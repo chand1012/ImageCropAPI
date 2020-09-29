@@ -29,14 +29,15 @@ async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41099
     image_buffer = BytesIO()
     content = BytesIO(response.content)
     image = Image.open(content.getvalue())
-    content.close()
-
+    
     cropped_image = image.crop((x, y, width+x, height+y))
     cropped_image.save(image_buffer, format=image_format)
-    cropped_image.close()
-
+    
     b64_image = base64.b64encode(image_buffer.getvalue())
+
     image_buffer.close()
+    cropped_image.close()
+    content.close()
 
     return {'image': b64_image}
 
@@ -56,15 +57,16 @@ async def crop_local(data: CropImage):
     image_buffer = BytesIO()
     content = BytesIO(base64.b64decode(b64_image))
     image = Image.open(content.getvalue())
-    content.close()
 
     cropped_image = image.crop((x, y, width+x, height+y))
     cropped_image.save(image_buffer, format=image_format)
-    cropped_image.close()
-
+    
     b64_image = base64.b64encode(image_buffer.getvalue())
 
     image_buffer.close()
+    cropped_image.close()
+    content.close()
+    cropped_image.close()
 
     return {'image': b64_image}
 
@@ -80,14 +82,14 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
     image_buffer = BytesIO()
     content = BytesIO(response.content)
     image = Image.open(content.getvalue())
-    content.close()
-
+    
     image.save(image_buffer, format=image_format)
-    image.close()
-
+    
     b64_image = base64.b64encode(image_buffer.getvalue())
 
     image_buffer.close()
+    content.close()
+    image.close()
 
     return {'image': b64_image}
 
@@ -103,13 +105,14 @@ async def convert_local(data: ConvertImage):
     image_buffer = BytesIO()
     content = BytesIO(base64.b64decode(b64_image))
     image = Image.open(content.getvalue())
-    content.close()
-
+    
     image.save(image_buffer, format=image_format)
-    image.close()
-
+    
     b64_image = base64.b64encode(image_buffer.getvalue())
+    
     image_buffer.close()
+    content.close()
+    image.close()
 
     return {'image': b64_image}
 
@@ -125,7 +128,6 @@ async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc410
     image_buffer = BytesIO()
     content = BytesIO(response.content)
     image = Image.open(content.getvalue())
-    content.close()
 
     resized = image.resize((width, height), resample=resample)
     resized.save(image_buffer, format=image_format)
@@ -134,6 +136,7 @@ async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc410
 
     image_buffer.close()
     image.close()
+    content.close()
     resized.close()
 
     return {'image': b64_image}
@@ -153,7 +156,6 @@ async def resize_local(data: ResizeImage):
     image_buffer = BytesIO()
     content = BytesIO(base64.b64decode(b64_image))
     image = Image.open(content.getvalue())
-    content.close()
 
     resized = image.resize((width, height), resample=resample)
     resized.save(image_buffer, format=image_format)
@@ -162,6 +164,7 @@ async def resize_local(data: ResizeImage):
     
     image.close()
     resized.close()
+    content.close()
     image_buffer.close()
 
     return {'image':b64_image}
