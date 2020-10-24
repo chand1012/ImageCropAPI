@@ -18,7 +18,7 @@ The application can be hosted one of two ways, either by running inside a virtua
 
 ## Pre Built Images
 
-To get the latest image, just run `docker pull chand1012/image-crop-api:master`. Unlike most Docker Images, I opted to use the branch as the tag. `master` will always get you the latest version. After pulling the image, just run `docker run chand1012/image-crop-api:master`.
+To get the latest image, just run `docker pull ghcr.io/chand1012/image-crop-api:master`. Unlike most Docker Images, I opted to use the branch as the tag. `master` will always get you the latest version. After pulling the image, just run `docker run ghcr.io/chand1012/image-crop-api:master`.
 
 ## Building the Docker Image.
 
