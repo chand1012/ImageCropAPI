@@ -12,12 +12,14 @@ from models import Base64ImageResponse, ConvertImage, CropImage, ResizeImage
 
 app = FastAPI()
 
+
 @app.get("/")
 async def index():
     """
     Redirects to the docs.
     """
     return RedirectResponse(url="/redoc")
+
 
 @app.get("/crop/", response_model=Base64ImageResponse)
 async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', height: int = 250, width: int = 250, x: int = 0, y: int = 0, image_format: str = 'JPEG'):
@@ -32,7 +34,8 @@ async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41099
     """
     response = requests.get(url)
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
+        raise HTTPException(status_code=response.status_code,
+                            detail=f'Server returned error {response.status_code}.')
 
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
@@ -41,24 +44,25 @@ async def crop_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41099
     content = BytesIO(response.content)
     content.seek(0)
     image = Image.open(content)
-    
+
     cropped_image = image.crop((x, y, width+x, height+y))
     cropped_image.save(image_buffer, format=image_format)
-    
+
     b64_image = base64.b64encode(image_buffer.getvalue())
 
     image_buffer.close()
     cropped_image.close()
     content.close()
     cropped_image.close()
-    
+
     return {'image': b64_image}
+
 
 @app.post("/crop/", response_model=Base64ImageResponse)
 async def crop_local(data: CropImage):
     """
     Crop the specified base64 image. Image must be in the form of a base64 string, regardless of format. See here for supported formats: https://tinyurl.com/yymmmpwk
-    
+
      * Variable `url` specifies the remote URL to pull the image from.
      * Variables `x` and `y` specify the origin point of the crop. 
      * The variables `width` and `height` specify the width and height of the output crop. 
@@ -83,7 +87,7 @@ async def crop_local(data: CropImage):
 
     cropped_image = image.crop((x, y, width+x, height+y))
     cropped_image.save(image_buffer, format=image_format)
-    
+
     b64_image = base64.b64encode(image_buffer.getvalue())
 
     image_buffer.close()
@@ -92,6 +96,7 @@ async def crop_local(data: CropImage):
     cropped_image.close()
 
     return {'image': b64_image}
+
 
 @app.get("/convert/", response_model=Base64ImageResponse)
 async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', image_format: str = 'JPEG'):
@@ -100,18 +105,19 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
     """
     response = requests.get(url)
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
+        raise HTTPException(status_code=response.status_code,
+                            detail=f'Server returned error {response.status_code}.')
 
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-    
+
     image_buffer = BytesIO()
     content = BytesIO(response.content)
     content.seek(0)
     image = Image.open(content)
-    
+
     image.save(image_buffer, format=image_format)
-    
+
     b64_image = base64.b64encode(image_buffer.getvalue())
 
     image_buffer.close()
@@ -119,6 +125,7 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
     image.close()
 
     return {'image': b64_image}
+
 
 @app.post("/convert/", response_model=Base64ImageResponse)
 async def convert_local(data: ConvertImage):
@@ -129,23 +136,24 @@ async def convert_local(data: ConvertImage):
 
     if get_b64_size(b64_image) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-    
+
     image_format = data.get('image_format')
 
     image_buffer = BytesIO()
     content = BytesIO(base64.b64decode(b64_image))
     content.seek(0)
     image = Image.open(content)
-    
+
     image.save(image_buffer, format=image_format)
-    
+
     b64_image = base64.b64encode(image_buffer.getvalue())
-    
+
     image_buffer.close()
     content.close()
     image.close()
 
     return {'image': b64_image}
+
 
 @app.get("/resize/", response_model=Base64ImageResponse)
 async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc4109956d035077ef5adb8', height: int = 250, width: int = 250, image_format: str = 'JPEG', resample: Optional[int] = 1):
@@ -166,11 +174,12 @@ async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc410
     """
     response = requests.get(url)
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=f'Server returned error {response.status_code}.')
+        raise HTTPException(status_code=response.status_code,
+                            detail=f'Server returned error {response.status_code}.')
 
     if len(response.content) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-    
+
     image_buffer = BytesIO()
     content = BytesIO(response.content)
     content.seek(0)
@@ -187,6 +196,7 @@ async def resize_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc410
     resized.close()
 
     return {'image': b64_image}
+
 
 @app.post("/resize/", response_model=Base64ImageResponse)
 async def resize_local(data: ResizeImage):
@@ -209,7 +219,7 @@ async def resize_local(data: ResizeImage):
 
     if get_b64_size(b64_image) > 20971520:
         raise HTTPException(status_code=413, detail="Content is too large.")
-    
+
     image_format = data.get('image_format')
     width = data.get('width')
     height = data.get('height')
@@ -224,11 +234,10 @@ async def resize_local(data: ResizeImage):
     resized.save(image_buffer, format=image_format)
 
     b64_image = base64.b64encode(image_buffer.getvalue())
-    
+
     image.close()
     resized.close()
     content.close()
     image_buffer.close()
 
-    return {'image':b64_image}
-
+    return {'image': b64_image}
