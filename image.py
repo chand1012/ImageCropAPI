@@ -5,7 +5,8 @@ from typing import Optional
 
 from PIL import Image
 
-def crop(image_buffer: BytesIO, x: int, y: int, width: int, height:int, image_format: str) -> BytesIO:
+
+def crop(image_buffer: BytesIO, x: int, y: int, width: int, height: int, image_format: str) -> BytesIO:
     image = Image.open(image_buffer)
 
     output = BytesIO()
@@ -22,6 +23,7 @@ def crop(image_buffer: BytesIO, x: int, y: int, width: int, height:int, image_fo
 
     return output
 
+
 def convert(image_buffer: BytesIO, image_format: str) -> BytesIO:
     image = Image.open(image_buffer)
 
@@ -33,12 +35,12 @@ def convert(image_buffer: BytesIO, image_format: str) -> BytesIO:
 
     image_buffer.close()
     image.close()
-    
+
     return output
 
-    
-def resize(image_buffer: BytesIO, width: int, height:int, image_format: str, resample: int = 1) -> BytesIO:
-    
+
+def resize(image_buffer: BytesIO, width: int, height: int, image_format: str, resample: int = 1) -> BytesIO:
+
     image = Image.open(image_buffer)
     output = BytesIO()
     resized = image.resize((width, height), resample=resample)

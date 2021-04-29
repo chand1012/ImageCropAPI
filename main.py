@@ -77,7 +77,7 @@ async def crop_local(data: CropImage):
     image_buffer = BytesIO()
     content = BytesIO(base64.b64decode(b64_image))
     content.seek(0)
-    
+
     image_buffer = crop(content, x, y, width, height, image_format)
 
     content.close()
@@ -100,11 +100,11 @@ async def convert_remote(url: str = 'https://s.gravatar.com/avatar/434d67e1ebc41
 
     content = BytesIO(response.content)
     content.seek(0)
-    
+
     image_buffer = convert(content, image_format)
 
     content.close()
-    
+
     return Response(image_buffer.getvalue(), status_code=200)
 
 
@@ -122,11 +122,11 @@ async def convert_local(data: ConvertImage):
 
     content = BytesIO(base64.b64decode(b64_image))
     content.seek(0)
-    
+
     image_buffer = convert(content, image_format)
 
     content.close()
-    
+
     return Response(image_buffer.getvalue(), status_code=200)
 
 
@@ -200,4 +200,3 @@ async def resize_local(data: ResizeImage):
     content.close()
 
     return Response(image_buffer.getvalue(), status_code=200)
-
