@@ -2,21 +2,18 @@ name: Docker Image CI
 
 on: [push]
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-    - name: Build Image
-      run: |
-        docker login ghcr.io -u chand1012 --password ${{ secrets.GHCR }}
-        docker build -t image-crop-api:${{ steps.extract_branch.outputs.branch }} .
-        docker tag image-crop-api:${{ steps.extract_branch.outputs.branch }} ghcr.io/chand1012/image-crop-api:${{ steps.extract_branch.outputs.branch }}
-        docker push ghcr.io/chand1012/image-crop-api:${{ steps.extract_branch.outputs.branch }}
-
+      - uses: actions/checkout@v2
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - name: Build Image
+        run: |
+          docker login ghcr.io -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
+          docker build -t image-crop-api:${{ steps.extract_branch.outputs.branch }} .
+          docker tag image-crop-api:${{ steps.extract_branch.outputs.branch }} ghcr.io/chand1012/image-crop-api:${{ steps.extract_branch.outputs.branch }}
+          docker push ghcr.io/chand1012/image-crop-api:${{ steps.extract_branch.outputs.branch }}
